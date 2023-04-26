@@ -1,70 +1,55 @@
-# Getting Started with Create React App
+# okta-cross-origin-resource-policy
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Minimal site to demonstrate Cross-Origin-Resource-Policy issue
 
-## Available Scripts
+## The goal: a SPA with cross-origin isolation
 
-In the project directory, you can run:
+In order for a site to enable [SharedArrayBuffer](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer), it has to be [crossOriginIsolated](https://developer.mozilla.org/en-US/docs/Web/API/crossOriginIsolated). In order to do this, it needs to be in a [secure context](https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts). It also needs to have these two headers:
 
-### `npm start`
+```
+Cross-Origin-Opener-Policy: same-origin
+Cross-Origin-Embedder-Policy: require-corp
+```
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+However, if the site is using [Okta OpenID Connect](https://www.okta.com/openid-connect/) for authentication, this creates a challenge. Specifically:
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+> Because your site has the Cross-Origin Embedder Policy (COEP) enabled, each resource must specify a suitable Cross-Origin Resource Policy (CORP). This behavior prevents a document from loading cross-origin resources which don’t explicitly grant permission to be loaded.
 
-### `npm test`
+## Running this site locally
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+In order to run this demo, you will need:
 
-### `npm run build`
+- A recent version onf Node.js installed
+- An Okta application, with a client ID
+- A sign-in redirect URI in your application
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Once, you have your Okta application, create a `.env` file in the root of this project with the following variables:
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+```
+REACT_APP_OKTA_ISSUER=https://my-company.okta.com
+REACT_APP_OKTA_CLIENT_ID=<application_client_id>
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Then, create a sign-in redirect UID in the Okta admin page for:
 
-### `npm run eject`
+```
+http://localhost:3000/implicit/callback
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+Next, install the javascript dependencies:
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+```
+npm install
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+Finally, start the development server:
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+```
+npm run start
+```
 
-## Learn More
+## Questions
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- Does this problem go away if we use PKCE instead of the implicit flow?
+- Does the `content-security-policy` header on the `/oauth/v1/authorize` endpoint matter? If so, how do we add an origin to it?
+- Are there other ways to enable cross-origin isolation on an OIDC application?
