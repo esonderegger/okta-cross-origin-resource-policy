@@ -8,7 +8,7 @@ const oktaConfig = {
   clientId: process.env.REACT_APP_OKTA_CLIENT_ID,
   issuer: process.env.REACT_APP_OKTA_ISSUER,
   redirectUri: `${window.location.origin}/implicit/callback`,
-  scopes: ["openid", "profile", "email"],
+  scopes: ["openid", "profile", "email", "offline_access"],
   pkce: false,
   tokenManager: {
     expireEarlySeconds: 3570,
